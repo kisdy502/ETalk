@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context="cn.sdt.etalk.ChatActivity">
+
+
+    <TextView
+        android:id="@+id/info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="2018-10-12 12:20:20"
+        android:textColor="#7F7F7F"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/from_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/info"
+        android:maxWidth="72dp"
+        android:text="Kellen"
+        android:textSize="16sp" />
+
+    <RelativeLayout
+        android:id="@+id/send_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/info"
+        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        android:gravity="left|top"
+        android:background="@drawable/msg_from_selector"
+        android:layout_toRightOf="@id/from_name">
+
+
+        <TextView
+            android:id="@+id/msg"
+            android:layout_marginLeft="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:hint="你们都在干什么呢?"
+            android:textColor="@android:color/black"
+            android:textSize="18sp" />
+
+    </RelativeLayout>
+</RelativeLayout>

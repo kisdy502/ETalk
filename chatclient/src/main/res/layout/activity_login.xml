@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="cn.sdt.etalk.RegisterActivity">
+
+    <RelativeLayout
+        android:id="@+id/name_layout"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginLeft="36dp"
+        android:layout_marginRight="36dp"
+        android:layout_marginTop="120dp">
+
+        <TextView
+            android:id="@+id/txtName"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:gravity="center|right"
+            android:textSize="18sp"
+            android:layout_alignTop="@+id/edtUserName"
+            android:text="用户名:" />
+
+        <EditText
+            android:id="@+id/edtUserName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="8dp"
+            android:textSize="20sp"
+            android:layout_toRightOf="@+id/txtName"
+            android:inputType="textPersonName"
+            android:text="kisdy" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/password_layout"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@+id/name_layout"
+        android:layout_marginLeft="36dp"
+        android:layout_marginRight="36dp"
+        android:layout_marginTop="12dp">
+
+        <TextView
+            android:id="@+id/txtPwd"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:gravity="center|right"
+            android:textSize="18sp"
+            android:text="密码:" />
+
+        <EditText
+            android:id="@+id/edtPwd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/txtPwd"
+            android:layout_marginLeft="8dp"
+            android:textSize="20sp"
+            android:inputType="textPassword"
+            android:text="123456" />
+
+    </RelativeLayout>
+
+
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/password_layout"
+        android:layout_marginLeft="36dp"
+        android:layout_marginRight="36dp"
+        android:textSize="22sp"
+        android:padding="16dp"
+        android:layout_marginTop="12dp"
+        android:text="登录" />
+
+    <Button
+        android:id="@+id/btnToRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnLogin"
+        android:layout_marginLeft="36dp"
+        android:layout_marginRight="36dp"
+        android:textSize="22sp"
+        android:padding="16dp"
+        android:background="@drawable/button_bg"
+        android:layout_marginTop="32dp"
+        android:textColor="#006688"
+        android:text="没有账户，去注册一个" />
+</RelativeLayout>

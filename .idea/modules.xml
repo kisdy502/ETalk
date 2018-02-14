@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ETalk.iml" filepath="$PROJECT_DIR$/ETalk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Libnio/Libnio.iml" filepath="$PROJECT_DIR$/Libnio/Libnio.iml" />
+      <module fileurl="file://$PROJECT_DIR$/chatclient/chatclient.iml" filepath="$PROJECT_DIR$/chatclient/chatclient.iml" />
+      <module fileurl="file://D:\Talk\ETalk\app\chatclient.iml" filepath="D:\Talk\ETalk\app\chatclient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/chatserver/chatserver.iml" filepath="$PROJECT_DIR$/chatserver/chatserver.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libnioclient/libnioclient.iml" filepath="$PROJECT_DIR$/libnioclient/libnioclient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libniocommon/libniocommon.iml" filepath="$PROJECT_DIR$/libniocommon/libniocommon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/libnioserver/libnioserver.iml" filepath="$PROJECT_DIR$/libnioserver/libnioserver.iml" />
+    </modules>
+  </component>
+</project>
