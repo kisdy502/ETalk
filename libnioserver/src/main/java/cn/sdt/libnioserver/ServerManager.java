@@ -68,6 +68,11 @@ public class ServerManager {
         if (nioServerAcceptor != null) {
             nioServerAcceptor.stop();
         }
+        for(Connection connection:connectionMap.values()){
+            connection.close();
+        }
+        connectionMap.clear();
+        nioServerAcceptor = null;
     }
 
     private IoHandler ioHandler = new IoHandler() {

@@ -5,6 +5,11 @@ import android.support.v4.util.ArrayMap;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
+import cn.sdt.libnioclient.handler.ChatComingHandler;
+import cn.sdt.libnioclient.handler.HeartResponseHandler;
+import cn.sdt.libnioclient.handler.IPacketHandler;
+import cn.sdt.libnioclient.handler.LoginResponseHandler;
+import cn.sdt.libnioclient.handler.RegisterResponseHandler;
 import cn.sdt.libniocommon.Packet;
 
 /**
@@ -22,7 +27,7 @@ public class PacketDispatcher {
     }
 
     static {
-        handlerArrayMap.put(Packet.HEART_RESPONSE_ID, new HeartHandler());
+        handlerArrayMap.put(Packet.HEART_RESPONSE_ID, new HeartResponseHandler());
         handlerArrayMap.put(Packet.REGIST_RESPONSE_ID, new RegisterResponseHandler());
         handlerArrayMap.put(Packet.LOGIN_RESPONSE_ID, new LoginResponseHandler());
         handlerArrayMap.put(Packet.CHAT_ID, new ChatComingHandler());

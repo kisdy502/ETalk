@@ -23,6 +23,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/info"
         android:layout_marginRight="10dp"
+        android:layout_marginTop="8dp"
         android:maxWidth="72dp"
         android:text="Kellen"
         android:textSize="16sp" />
@@ -34,14 +35,18 @@
         android:layout_below="@+id/info"
         android:layout_marginTop="8dp"
         android:layout_toLeftOf="@+id/to_name"
-        android:background="@drawable/msg_to_selector"
+        android:background="#7700AA00"
+        android:layout_marginRight="8dp"
         android:gravity="right">
 
         <TextView
             android:id="@+id/msg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="我还在家里呢，睡觉"
+            android:text="我还在家里呢，睡觉,真的是太无聊了，完全没人理我了，求聊天"
+            android:maxWidth="240dp"
+            android:layout_margin="4dp"
+            android:textColorHint="#cccccc"
             android:textColor="@android:color/black"
             android:textSize="18sp" />
 

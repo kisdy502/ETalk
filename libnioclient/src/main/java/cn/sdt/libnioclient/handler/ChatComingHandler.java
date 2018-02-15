@@ -1,7 +1,10 @@
-package cn.sdt.libnioclient;
+package cn.sdt.libnioclient.handler;
 
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
+
+import cn.sdt.libnioclient.ClientManager;
+import cn.sdt.libnioclient.MsgReceiver;
 import cn.sdt.libniocommon.Packet;
 
 /**

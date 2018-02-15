@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import cn.sdt.libnioclient.ClientManager;
@@ -17,6 +19,8 @@ import cn.sdt.libniocommon.util.SharePrefUtil;
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
 
     final static String TAG = "login";
+    private RelativeLayout contentLayout;
+    private ProgressBar progressBar;
     private EditText edtUserName;
     private EditText edtPassword;
     private Button btnLogin;
@@ -25,6 +29,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        contentLayout = (RelativeLayout) findViewById(R.id.contentLayout);
+        progressBar = (ProgressBar) findViewById(R.id.progress);
         edtUserName = (EditText) findViewById(R.id.edtUserName);
         edtPassword = (EditText) findViewById(R.id.edtPwd);
         btnLogin = (Button) findViewById(R.id.btnLogin);
@@ -43,17 +49,30 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     @Override
     public void onClick(View v) {
         if (ClientManager.getInstance().isConnected()) {
+            hideProgressbar(false);
             login();
         } else {
+            hideProgressbar(false);
             initConn();
         }
     }
 
+    private void hideProgressbar(boolean hide) {
+        int v1 = hide ? View.GONE : View.VISIBLE;
+        int v2 = hide ? View.VISIBLE : View.GONE;
+        progressBar.setVisibility(v1);
+        contentLayout.setVisibility(v2);
+    }
+
+
     @Override
     protected void parseMsg(int type, String msg) {
         super.parseMsg(type, msg);
+        hideProgressbar(true);
         if (type == IMsgType.MSG_CONNECTED) {
             login();
+        } else if (type == IMsgType.MSG_CONNECTED_FAILED) {
+            Toast.makeText(this, "无法连接到服务器，请检查网络是否连接", Toast.LENGTH_SHORT).show();
         } else if (type == IMsgType.MSG_LOGINED) {
             SharePrefUtil.saveUserInfo(getApplicationContext(), edtUserName.getText().toString().trim(),
                     edtPassword.getText().toString().trim());
@@ -79,7 +98,12 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     }
 
     private void initConn() {
-        ClientManager.getInstance().start("10.0.2.15", 9000);
+        ClientManager.getInstance().start("192.168.1.102", 9000);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ClientManager.getInstance().stop();
+    }
 }

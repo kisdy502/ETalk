@@ -32,6 +32,10 @@ public class MsgReceiver {
         boardMsg(context, IMsgType.MSG_CONNECTED_FAILED, msg);
     }
 
+    public static void boardDisConnectedMsg(Context context, String msg) {
+        boardMsg(context, IMsgType.MSG_DISCONNECTED, msg);
+    }
+
 
     public static void boardRegisteredMsg(Context context, String msg) {
         boardMsg(context, IMsgType.MSG_REGISTERED, msg);

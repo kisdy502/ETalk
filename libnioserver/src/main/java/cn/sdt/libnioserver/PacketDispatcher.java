@@ -6,6 +6,11 @@ import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
 import cn.sdt.libniocommon.Packet;
+import cn.sdt.libnioserver.handler.ChatHandler;
+import cn.sdt.libnioserver.handler.HeartHandler;
+import cn.sdt.libnioserver.handler.IPacketHandler;
+import cn.sdt.libnioserver.handler.LoginHandler;
+import cn.sdt.libnioserver.handler.RegisterHandler;
 
 /**
  * Created by SDT13411 on 2018/2/12.

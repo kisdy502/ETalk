@@ -28,4 +28,10 @@ public class ServerActivity extends BaseActivity {
         ServerManager.getInstance().start(9000);
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ServerManager.getInstance().stop();
+    }
 }

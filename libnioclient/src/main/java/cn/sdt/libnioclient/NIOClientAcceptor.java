@@ -30,6 +30,10 @@ public class NIOClientAcceptor extends NIOAcceptor {
 
     IoHandler ioHandler;
 
+    public SocketChannel getSocketChannel() {
+        return socketChannel;
+    }
+
     public void setIoHandler(IoHandler ioHandler) {
         this.ioHandler = ioHandler;
     }
@@ -47,6 +51,7 @@ public class NIOClientAcceptor extends NIOAcceptor {
             socketChannel.configureBlocking(false);
             socketChannel.register(selector, SelectionKey.OP_CONNECT);
             boolean connected = socketChannel.connect(new InetSocketAddress(ip, port));
+            isRunning = true;
             Log.d(TAG, "01:isConnected:" + connected);
             // 开辟一个新线程来读取从服务器端的数据
             try {
@@ -80,8 +85,11 @@ public class NIOClientAcceptor extends NIOAcceptor {
 
     public void send(ByteBuffer buffer) {
         try {
-            if (socketChannel.isConnected())
-                socketChannel.write(buffer);
+            if (socketChannel.isConnected()) {
+                while (buffer.hasRemaining()) {
+                    socketChannel.write(buffer);
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -99,10 +107,12 @@ public class NIOClientAcceptor extends NIOAcceptor {
         Log.d(TAG, "stop");
         if (ioHandler != null && socketChannel != null) {
             ioHandler.onDisconnected(socketChannel);
+
         }
         if (socketChannel != null) {
             try {
                 socketChannel.close();
+                socketChannel = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -110,6 +120,7 @@ public class NIOClientAcceptor extends NIOAcceptor {
         if (selector != null) {
             try {
                 selector.close();
+                selector = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -121,12 +132,22 @@ public class NIOClientAcceptor extends NIOAcceptor {
         if (sk.isConnectable()) {
             SocketChannel client = (SocketChannel) sk.channel();
             if (client.isConnectionPending()) {
-                client.finishConnect();
-                Log.d(TAG, "02:isConnected:" + socketChannel.isConnected());
-                if (ioHandler != null) {
-                    ioHandler.onConnected(socketChannel);
+                try {
+                    boolean result = client.finishConnect();
+                    Log.i(TAG, "result:" + result);
+                    if (ioHandler != null) {
+                        ioHandler.onConnected(client);
+                    }
+                    sk.interestOps(SelectionKey.OP_READ);
+                } catch (IOException e) {
+                    Log.e(TAG, "无法连接打服务器");
+                    if (ioHandler != null) {
+                        ioHandler.onConnectFailed(client);
+                    }
+                    stop();
                 }
-                sk.interestOps(SelectionKey.OP_READ);
+            } else {
+                Log.e(TAG, "没有尝试去连接了");
             }
         } else if (sk.isReadable()) {
             // 使用 NIO 读取 Channel中的数据，这个和全局变量sc是一样的，因为只注册了一个SocketChannel
@@ -139,6 +160,7 @@ public class NIOClientAcceptor extends NIOAcceptor {
             }
 
             if (readCount == -1) {
+                socketChannel.close();
                 if (ioHandler != null) {
                     ioHandler.onDisconnected(socketChannel);
                 }

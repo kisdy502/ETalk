@@ -1,4 +1,4 @@
-package cn.sdt.libnioserver;
+package cn.sdt.libnioserver.handler;
 
 import android.util.Log;
 
@@ -7,6 +7,7 @@ import java.nio.channels.SocketChannel;
 
 import cn.sdt.libniocommon.Packet;
 import cn.sdt.libniocommon.util.DateUtil;
+import cn.sdt.libnioserver.ServerManager;
 
 /**
  * Created by SDT13411 on 2018/2/13.

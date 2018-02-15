@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    tools:context="cn.sdt.etalk.ChatActivity">
+    android:layout_height="wrap_content">
 
 
     <TextView
@@ -21,6 +20,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/info"
+        android:layout_marginTop="8dp"
+        android:layout_alignParentLeft="true"
         android:maxWidth="72dp"
         android:text="Kellen"
         android:textSize="16sp" />
@@ -30,22 +31,21 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/info"
-        android:layout_marginTop="8dp"
         android:layout_marginLeft="8dp"
-        android:gravity="left|top"
-        android:background="@drawable/msg_from_selector"
-        android:layout_toRightOf="@id/from_name">
+        android:layout_marginTop="8dp"
+        android:layout_toRightOf="@id/from_name"
+        android:background="#77999999"
+        android:gravity="left">
 
 
         <TextView
             android:id="@+id/msg"
-            android:layout_marginLeft="12dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:hint="你们都在干什么呢?"
+            android:maxWidth="240dp"
+            android:layout_margin="4dp"
+            android:text="你们都在干什么呢,怎么没人找我麻烦呢?"
             android:textColor="@android:color/black"
             android:textSize="18sp" />
-
     </RelativeLayout>
 </RelativeLayout>

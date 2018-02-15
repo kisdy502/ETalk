@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import cn.sdt.libniocommon.BufferUtil;
+import cn.sdt.libniocommon.IMsgType;
 import cn.sdt.libniocommon.IoHandler;
 import cn.sdt.libniocommon.Packet;
 
@@ -20,7 +21,9 @@ import cn.sdt.libniocommon.Packet;
  */
 
 public class ClientManager {
+
     private final static String TAG = "ClientManager";
+
     private NIOClientAcceptor nioClientAcceptor;
 
     private Context mContext;
@@ -40,7 +43,7 @@ public class ClientManager {
 
     private ClientManager() {
         msgQueue = new ArrayBlockingQueue<Packet>(12);
-
+        HeartRunnable runnable = new HeartRunnable(this);
     }
 
     public static ClientManager getInstance() {
@@ -88,12 +91,14 @@ public class ClientManager {
     private IoHandler ioHandler = new IoHandler() {
         @Override
         public void onConnected(SocketChannel socketChannel) {
+            Log.i(TAG, "onConnected");
             connected = true;
             MsgReceiver.boardConnectedMsg(mContext, "");
         }
 
         @Override
         public void onConnectFailed(SocketChannel socketChannel) {
+            Log.i(TAG, "onConnectFailed");
             MsgReceiver.boardConnectedFailedMsg(mContext, "");
         }
 
@@ -107,17 +112,18 @@ public class ClientManager {
 
         @Override
         public void onPacketSend(SocketChannel socketChannel, ByteBuffer buffer) {
-
         }
 
         @Override
         public void onDisconnected(SocketChannel client) {
             connected = false;
+            Log.i(TAG, "onDisconnected");
+            MsgReceiver.boardDisConnectedMsg(mContext, "");
         }
 
         @Override
         public void onException(Exception e) {
-
+            Log.i(TAG, "onException:" + e.getMessage());
         }
     };
 
@@ -129,4 +135,20 @@ public class ClientManager {
     public Context getContext() {
         return mContext;
     }
+
+    public Gson getGson() {
+        return gson;
+    }
+
+    public Charset getCharset() {
+        return charset;
+    }
+
+    public SocketChannel getSocketChannel() {
+        if (nioClientAcceptor != null)
+            return nioClientAcceptor.getSocketChannel();
+        return null;
+    }
+
+
 }

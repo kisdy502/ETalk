@@ -52,5 +52,14 @@ public class Connection {
         }
     }
 
+    public void close(){
+        if(socketChannel!=null)
+            try {
+                socketChannel.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    }
+
 
 }
