@@ -1,6 +1,9 @@
 package cn.sdt.libnioclient;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -12,7 +15,6 @@ import java.nio.charset.Charset;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import cn.sdt.libniocommon.BufferUtil;
-import cn.sdt.libniocommon.IMsgType;
 import cn.sdt.libniocommon.IoHandler;
 import cn.sdt.libniocommon.Packet;
 
@@ -24,11 +26,18 @@ public class ClientManager {
 
     private final static String TAG = "ClientManager";
 
+    public final static int MSG_TIMEOUT = 1;
+    public final static int DELAY_TIME = 24 * 1000;
+
+    private Handler mHandler;
+
     private NIOClientAcceptor nioClientAcceptor;
 
     private Context mContext;
 
     private static ClientManager instance;
+
+    HeartRunnable heartRunnable;
 
     private ArrayBlockingQueue<Packet> msgQueue;
     private Gson gson = new Gson();
@@ -43,7 +52,14 @@ public class ClientManager {
 
     private ClientManager() {
         msgQueue = new ArrayBlockingQueue<Packet>(12);
-        HeartRunnable runnable = new HeartRunnable(this);
+        mHandler = new Handler(Looper.getMainLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                if (msg.what == MSG_TIMEOUT) {
+                    Log.d(TAG, "心跳超时");
+                }
+            }
+        };
     }
 
     public static ClientManager getInstance() {
@@ -79,7 +95,15 @@ public class ClientManager {
                 }
             }.start();
         }
+    }
 
+    public void equeuePacke(final Packet packet) {
+        try {
+            msgQueue.put(packet);
+        } catch (InterruptedException e) {
+            Log.d(TAG, "消息放入队列发生异常:" + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void stop() {
@@ -93,21 +117,27 @@ public class ClientManager {
         public void onConnected(SocketChannel socketChannel) {
             Log.i(TAG, "onConnected");
             connected = true;
-            MsgReceiver.boardConnectedMsg(mContext, "");
+            heartRunnable = new HeartRunnable(ClientManager.this);
+            new Thread(heartRunnable).start();
+            MsgReceiver.boardConnectedMsg(mContext, "连接成功");
         }
 
         @Override
         public void onConnectFailed(SocketChannel socketChannel) {
             Log.i(TAG, "onConnectFailed");
-            MsgReceiver.boardConnectedFailedMsg(mContext, "");
+            MsgReceiver.boardConnectedFailedMsg(mContext, "连接失败");
         }
 
         @Override
-        public void onPacketReceived(SocketChannel socketChannel, ByteBuffer buffer) throws IOException {
+        public void onPacketReceived(SocketChannel socketChannel, ByteBuffer buffer) {
             String text = BufferUtil.getString(charset, buffer);
             Log.d(TAG, "Received:" + text);
             Packet packet = gson.fromJson(text, Packet.class);
-            PacketDispatcher.dispatch(ClientManager.this, socketChannel, packet);
+            try {
+                PacketDispatcher.dispatch(ClientManager.this, socketChannel, packet);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -118,7 +148,9 @@ public class ClientManager {
         public void onDisconnected(SocketChannel client) {
             connected = false;
             Log.i(TAG, "onDisconnected");
-            MsgReceiver.boardDisConnectedMsg(mContext, "");
+            if (heartRunnable != null)
+                heartRunnable.stop();
+            MsgReceiver.boardDisConnectedMsg(mContext, "断开连接");
         }
 
         @Override
@@ -150,5 +182,7 @@ public class ClientManager {
         return null;
     }
 
-
+    public Handler getHandler() {
+        return mHandler;
+    }
 }

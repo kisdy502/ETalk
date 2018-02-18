@@ -68,7 +68,7 @@ public class ServerManager {
         if (nioServerAcceptor != null) {
             nioServerAcceptor.stop();
         }
-        for(Connection connection:connectionMap.values()){
+        for (Connection connection : connectionMap.values()) {
             connection.close();
         }
         connectionMap.clear();
@@ -98,11 +98,18 @@ public class ServerManager {
         }
 
         @Override
-        public void onPacketReceived(SocketChannel socketChannel, ByteBuffer buffer) throws IOException {
+        public void onPacketReceived(SocketChannel socketChannel, ByteBuffer buffer) {
             String text = BufferUtil.getString(charset, buffer);
             Log.i(TAG, "Received:" + text);
             Packet packet = gson.fromJson(text, Packet.class);
-            PacketDispatcher.dispatch(ServerManager.this, socketChannel, packet);
+            try {
+                PacketDispatcher.dispatch(ServerManager.this, socketChannel, packet);
+            } catch (IOException e) {
+                if (ioHandler != null) {
+                    ioHandler.onException(e);
+                }
+                e.printStackTrace();
+            }
         }
 
         @Override

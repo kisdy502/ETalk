@@ -2,7 +2,6 @@ package cn.sdt.libnioclient;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
 
 import cn.sdt.libniocommon.Packet;
 
@@ -16,6 +15,7 @@ public class HeartRunnable implements Runnable {
     private boolean isRunning = true;
     private Packet packet;
     private ByteBuffer heartBuff;
+    private String data;
 
     public void setClientManager(ClientManager clientManager) {
         this.clientManager = clientManager;
@@ -24,20 +24,22 @@ public class HeartRunnable implements Runnable {
     public HeartRunnable(ClientManager clientManager) {
         this.clientManager = clientManager;
         packet = new Packet(Packet.HEART_ID);
-
     }
 
     @Override
     public void run() {
         if (clientManager.isConnected()) {
-            heartBuff = ByteBuffer.allocate(16);
-            String data = clientManager.getGson().toJson(packet);
-            heartBuff = clientManager.getCharset().encode(data);
+            data = clientManager.getGson().toJson(packet);
         }
         try {
             while (isRunning) {
-                clientManager.getSocketChannel().write(heartBuff);
-                Thread.sleep(1000 * 60 * 2);//2分钟一次的心跳
+                heartBuff = null;
+                heartBuff = clientManager.getCharset().encode(data);
+                while (heartBuff.hasRemaining()) {
+                    clientManager.getSocketChannel().write(heartBuff);
+                }
+                clientManager.getHandler().sendEmptyMessageDelayed(ClientManager.MSG_TIMEOUT, ClientManager.DELAY_TIME);
+                Thread.sleep(ClientManager.DELAY_TIME);//60s一次的心跳
             }
         } catch (IOException e) {
             e.printStackTrace();

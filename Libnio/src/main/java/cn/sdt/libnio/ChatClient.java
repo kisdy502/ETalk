@@ -14,6 +14,7 @@ import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
 
 import cn.sdt.NIOConnection;
 
@@ -34,6 +35,8 @@ public class ChatClient extends NIOConnection {
     private static String USER_CONTENT_SPILIT = "#@#";
 
     private volatile boolean connected = false;
+
+    private ExecutorService executorService;
 
     public boolean isConnected() {
         return connected;

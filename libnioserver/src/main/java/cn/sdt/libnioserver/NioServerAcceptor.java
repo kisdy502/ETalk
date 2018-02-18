@@ -21,7 +21,7 @@ import cn.sdt.libniocommon.NIOAcceptor;
  */
 
 public class NioServerAcceptor extends NIOAcceptor {
-
+    private final static String TAG = "NioServerAcceptor";
     private ServerSocketChannel serverSocketChannel;
     private ServerSocket serverSocket;
     private IoHandler ioHandler;
@@ -61,7 +61,11 @@ public class NioServerAcceptor extends NIOAcceptor {
                     SelectionKey key = iterator.next();
                     iterator.remove();
                     //处理当前的选择键
-                    dealWithSelectionKey(serverSocketChannel, key);
+                    if (key.isAcceptable()) {
+                        handleAcceptableKey(serverSocketChannel, key);
+                    } else if (key.isReadable()) {
+                        handleReadableKey(key);
+                    }
                 }
             }
         } catch (IOException e) {
@@ -100,10 +104,10 @@ public class NioServerAcceptor extends NIOAcceptor {
             }
     }
 
-    private void dealWithSelectionKey(ServerSocketChannel server, SelectionKey key)
-            throws IOException {
-        if (key.isAcceptable()) {
-            SocketChannel sChannel = server.accept();
+    private void handleAcceptableKey(ServerSocketChannel server, SelectionKey key) {
+        SocketChannel sChannel = null;
+        try {
+            sChannel = server.accept();
             sChannel.configureBlocking(false);
             sChannel.register(mSelector, SelectionKey.OP_READ);
             //将此对应的channel设置为准备接收其他客户端的请求
@@ -111,21 +115,25 @@ public class NioServerAcceptor extends NIOAcceptor {
             if (ioHandler != null) {
                 ioHandler.onConnected(sChannel);
             }
-        } else if (key.isReadable()) {                //处理来自客户端的数据读取请求
-            int receivedcount = 0;
-            SocketChannel sChannel = (SocketChannel) key.channel();
-            ByteBuffer buffer = ByteBuffer.allocate(1024);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-            try {
-                while ((receivedcount = sChannel.read(buffer)) > 0) {
-                    buffer.flip();
-                }
-                key.interestOps(SelectionKey.OP_READ);
-            } catch (Exception e) {
-                e.printStackTrace();
-                key.cancel();
-                sChannel.close();
+    }
+
+    private void handleReadableKey(SelectionKey key) {
+        int receivedcount = 0;  //当一方断开连接时，值为-1
+
+        SocketChannel sChannel = (SocketChannel) key.channel();
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        try {
+            while ((receivedcount = sChannel.read(buffer)) > 0) {
+                buffer.flip();
             }
+            key.interestOps(SelectionKey.OP_READ);
+
+            Log.i(TAG, "receivedcount:" + receivedcount);
+            Log.i(TAG, "buffer 已经写入了:" + buffer.limit());
 
             if (receivedcount == -1) {
                 if (ioHandler != null) {
@@ -138,6 +146,16 @@ public class NioServerAcceptor extends NIOAcceptor {
                     ioHandler.onPacketReceived(sChannel, buffer);
                 }
             }
+        } catch (IOException e) {
+            key.cancel();
+            try {
+                sChannel.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            e.printStackTrace();
         }
     }
+
+
 }

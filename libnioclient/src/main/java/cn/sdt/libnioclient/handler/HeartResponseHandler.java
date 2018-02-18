@@ -15,11 +15,13 @@ import cn.sdt.libniocommon.util.DateUtil;
 
 public class HeartResponseHandler implements IPacketHandler {
 
+
     private final static String TAG = "HeartResponseHandler";
 
     @Override
     public void handler(ClientManager clientManager, SocketChannel socketChannel, Packet packet) throws IOException {
-        Log.d(TAG, "at:" + DateUtil.timestampToDate(System.currentTimeMillis())
+        Log.d(TAG, "at:" + DateUtil.timestampToDateString(System.currentTimeMillis(),DateUtil.FORMAT_HHMMSS)
                 + ",heart from client:" + socketChannel.socket().getRemoteSocketAddress());
+        clientManager.getHandler().removeMessages(ClientManager.MSG_TIMEOUT);
     }
 }

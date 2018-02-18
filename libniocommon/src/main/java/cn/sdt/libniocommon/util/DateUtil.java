@@ -15,6 +15,7 @@ public class DateUtil {
     public final static String FORMAT_MMDDHH = "MMDDHH";
     public final static String FORMAT_YYYYMMDD = "yyyy-MM-dd";
     public final static String FORMAT_YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
+    public final static String FORMAT_HHMMSS = "HH:mm:ss";
 
     /**
      * 将时间转换为时间戳

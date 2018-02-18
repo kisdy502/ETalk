@@ -2,7 +2,10 @@ package cn.sdt.libnioserver.handler;
 
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 import cn.sdt.libniocommon.Packet;
@@ -19,7 +22,12 @@ public class HeartHandler implements IPacketHandler {
 
     @Override
     public void handler(ServerManager serverManager, SocketChannel socketChannel, Packet packet) throws IOException {
-        Log.d(TAG, "at:" + DateUtil.timestampToDate(System.currentTimeMillis())
-                + ",heart from client:" + socketChannel.socket().getRemoteSocketAddress());
+        Log.d(TAG, "at:" + DateUtil.timestampToDateString(System.currentTimeMillis(),DateUtil.FORMAT_MMDDHH)
+                + ",heart response:" + socketChannel.socket().getRemoteSocketAddress());
+        packet.setpId(Packet.HEART_RESPONSE_ID);
+        ByteBuffer buffer = serverManager.getCharset().encode(serverManager.getGson().toJson(packet));
+        while (buffer.hasRemaining()) {
+            socketChannel.write(buffer);
+        }
     }
 }

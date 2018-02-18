@@ -65,7 +65,11 @@ public class NIOClientAcceptor extends NIOAcceptor {
                     while (keyIterator.hasNext()) {
                         SelectionKey sk = (SelectionKey) keyIterator.next();
                         keyIterator.remove();
-                        dealWithSelectionKey(sk);
+                        if (sk.isConnectable()) {
+                            handleConnectKey(sk);
+                        } else if (sk.isReadable()) {
+                            handlerReadKey(sk);
+                        }
                     }
                 }
             } catch (IOException e) {
@@ -128,28 +132,30 @@ public class NIOClientAcceptor extends NIOAcceptor {
 
     }
 
-    private void dealWithSelectionKey(SelectionKey sk) throws IOException {
-        if (sk.isConnectable()) {
-            SocketChannel client = (SocketChannel) sk.channel();
-            if (client.isConnectionPending()) {
-                try {
-                    boolean result = client.finishConnect();
-                    Log.i(TAG, "result:" + result);
-                    if (ioHandler != null) {
-                        ioHandler.onConnected(client);
-                    }
-                    sk.interestOps(SelectionKey.OP_READ);
-                } catch (IOException e) {
-                    Log.e(TAG, "无法连接打服务器");
-                    if (ioHandler != null) {
-                        ioHandler.onConnectFailed(client);
-                    }
-                    stop();
+    private void handleConnectKey(SelectionKey sk) {
+        SocketChannel client = (SocketChannel) sk.channel();
+        if (client.isConnectionPending()) {
+            try {
+                boolean result = client.finishConnect();
+                Log.i(TAG, "result:" + result);
+                if (ioHandler != null) {
+                    ioHandler.onConnected(client);
                 }
-            } else {
-                Log.e(TAG, "没有尝试去连接了");
+                sk.interestOps(SelectionKey.OP_READ);
+            } catch (IOException e) {
+                Log.e(TAG, "无法连接打服务器");
+                if (ioHandler != null) {
+                    ioHandler.onConnectFailed(client);
+                }
+                stop();
             }
-        } else if (sk.isReadable()) {
+        } else {
+            Log.e(TAG, "没有尝试去连接了");
+        }
+    }
+
+    private void handlerReadKey(SelectionKey sk) {
+        try {
             // 使用 NIO 读取 Channel中的数据，这个和全局变量sc是一样的，因为只注册了一个SocketChannel
             // sc既能写也能读，这边是读
             SocketChannel socketChannel = (SocketChannel) sk.channel();
@@ -158,7 +164,8 @@ public class NIOClientAcceptor extends NIOAcceptor {
             while ((readCount = socketChannel.read(buff)) > 0) {
                 buff.flip();
             }
-
+            Log.d(TAG, "readCount::" + readCount);
+            Log.d(TAG, "buff读到的内容长度::" + buff.limit());
             if (readCount == -1) {
                 socketChannel.close();
                 if (ioHandler != null) {
@@ -169,8 +176,11 @@ public class NIOClientAcceptor extends NIOAcceptor {
                     ioHandler.onPacketReceived(socketChannel, buff);
                 }
             }
-
+        } catch (Exception e) {
+            Log.d(TAG, e.getMessage());
+            e.printStackTrace();
         }
     }
+
 
 }

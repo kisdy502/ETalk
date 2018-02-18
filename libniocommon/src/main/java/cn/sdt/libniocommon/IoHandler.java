@@ -14,9 +14,9 @@ public interface IoHandler {
 
     void onConnectFailed(SocketChannel socketChannel);
 
-    void onPacketReceived(SocketChannel socketChannel,ByteBuffer buffer) throws IOException;
+    void onPacketReceived(SocketChannel socketChannel, ByteBuffer buffer);
 
-    void onPacketSend(SocketChannel socketChannel,ByteBuffer buffer);
+    void onPacketSend(SocketChannel socketChannel, ByteBuffer buffer);
 
     void onDisconnected(SocketChannel client);
 
