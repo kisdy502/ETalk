@@ -17,5 +17,7 @@ public abstract class NIOAcceptor {
 
     protected abstract void stop();
 
-
+    public boolean isRunning() {
+        return isRunning;
+    }
 }

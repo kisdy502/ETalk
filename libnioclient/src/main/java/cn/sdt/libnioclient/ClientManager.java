@@ -38,6 +38,7 @@ public class ClientManager {
     private static ClientManager instance;
 
     HeartRunnable heartRunnable;
+    MsgQueueRunnable msgQueueRunnable;
 
     private ArrayBlockingQueue<Packet> msgQueue;
     private Gson gson = new Gson();
@@ -97,12 +98,20 @@ public class ClientManager {
         }
     }
 
-    public void equeuePacke(final Packet packet) {
-        try {
-            msgQueue.put(packet);
-        } catch (InterruptedException e) {
-            Log.d(TAG, "消息放入队列发生异常:" + e.getMessage());
-            e.printStackTrace();
+    void directSend(final Packet packet) {
+        String data = gson.toJson(packet);
+        ByteBuffer buffer = charset.encode(data);
+        nioClientAcceptor.send(buffer);
+    }
+
+    public void equeuePacket(final Packet packet) {
+        if (connected) {
+            try {
+                msgQueue.put(packet);
+            } catch (InterruptedException e) {
+                Log.d(TAG, "消息放入队列发生异常:" + e.getMessage());
+                e.printStackTrace();
+            }
         }
     }
 
@@ -118,8 +127,18 @@ public class ClientManager {
             Log.i(TAG, "onConnected");
             connected = true;
             heartRunnable = new HeartRunnable(ClientManager.this);
+            msgQueueRunnable = new MsgQueueRunnable(ClientManager.this);
             new Thread(heartRunnable).start();
+            new Thread(msgQueueRunnable).start();
             MsgReceiver.boardConnectedMsg(mContext, "连接成功");
+
+            new Thread() {
+                @Override
+                public void run() {
+
+                }
+            }.start();
+
         }
 
         @Override
@@ -150,6 +169,9 @@ public class ClientManager {
             Log.i(TAG, "onDisconnected");
             if (heartRunnable != null)
                 heartRunnable.stop();
+            if (msgQueueRunnable != null) {
+                msgQueueRunnable.stop();
+            }
             MsgReceiver.boardDisConnectedMsg(mContext, "断开连接");
         }
 
@@ -184,5 +206,9 @@ public class ClientManager {
 
     public Handler getHandler() {
         return mHandler;
+    }
+
+    public ArrayBlockingQueue<Packet> getMsgQueue() {
+        return msgQueue;
     }
 }

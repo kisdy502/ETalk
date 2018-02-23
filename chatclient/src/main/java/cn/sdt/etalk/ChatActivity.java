@@ -76,7 +76,7 @@ public class ChatActivity extends BaseActivity implements View.OnClickListener {
             Packet packet = new Packet(Packet.CHAT_ID);
             packet.add("userName", userName);
             packet.add("body", text);
-            ClientManager.getInstance().send(packet);
+            ClientManager.getInstance().equeuePacket(packet);
             ChatMsg msg = new ChatMsg(userName, true, text);
             msgList.add(msg);
             msgAdapter.notifyItemRangeInserted(msgList.size(), 1);
